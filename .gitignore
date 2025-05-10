@@ -6,3 +6,6 @@ go.sum
 
 # Swaggo configs
 docs/
+
+# My custom notes
+NOTES
