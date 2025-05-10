@@ -1,0 +1,9 @@
+[build]
+  cmd = "swag init -g ./cmd/main.go --output ./docs && go run ./cmd/main.go"
+  bin = "tmp/main"
+  full_bin = ""
+  include_ext = ["go"]
+  exclude_dir = ["docs"]
+  exclude_file = []
+  exclude_regex = []
+  follow_symlink = true
