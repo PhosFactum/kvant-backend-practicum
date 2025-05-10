@@ -1,0 +1,8 @@
+# Sensible data
+.env
+
+# Caches and misc
+go.sum
+
+# Swaggo configs
+docs/
