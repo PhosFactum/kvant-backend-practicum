@@ -3,7 +3,6 @@
 
 # Caches
 go.sum
-tmp/
 
 # Swaggo configs
 docs/
