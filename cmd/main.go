@@ -1,11 +1,15 @@
 package main
 
 import (
+    "fmt"
     "log"
     "net/http"
+    "os"
+
     "github.com/gin-gonic/gin"
     swaggerFiles "github.com/swaggo/files"
     ginSwagger "github.com/swaggo/gin-swagger"
+    "github.com/joho/godotenv"
     "github.com/PhosFactum/kvant-backend-practicum/internal/handlers"
     "github.com/PhosFactum/kvant-backend-practicum/internal/models"
     "github.com/PhosFactum/kvant-backend-practicum/docs"
@@ -19,14 +23,31 @@ import (
 // @host localhost:8080
 // @BasePath /
 func main() {
+    // Загружаем переменные из .env
+    err := godotenv.Load()
+    if err != nil {
+        log.Fatal("Ошибка при загрузке .env файла")
+    }
+
+    dbHost := os.Getenv("DB_HOST")
+    dbUser := os.Getenv("DB_USER")
+    dbPassword := os.Getenv("DB_PASSWORD")
+    dbName := os.Getenv("DB_NAME")
+    dbPort := os.Getenv("DB_PORT")
+    port := os.Getenv("PORT")
+
+    // Формируем строку подключения
+    dsn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
+        dbHost, dbPort, dbUser, dbName, dbPassword)
+
     // Подключение к PostgreSQL
-    db, err := gorm.Open("postgres", "postgres://kvant_user:11111111@localhost/kvant_db?sslmode=disable")
+    db, err := gorm.Open("postgres", dsn)
     if err != nil {
         log.Fatal(err)
     }
     defer db.Close()
 
-    // Автомиграции (опционально)
+    // Автомиграции
     db.AutoMigrate(&models.User{}, &models.Order{})
 
     // Инициализация Gin
@@ -42,12 +63,14 @@ func main() {
     // Роуты
     router.GET("/users", userHandler.GetUsers)
     router.GET("/user/:id", userHandler.GetUserByID)
-	router.POST("/user", userHandler.CreateUser)
+    router.POST("/user", userHandler.CreateUser)
     router.PUT("/user/:id", userHandler.UpdateUser)
     router.DELETE("/user/:id", userHandler.DeleteUser)
 
     // Запуск сервера
-    if err := http.ListenAndServe(":8080", router); err != nil {
+    addr := fmt.Sprintf(":%s", port)
+    if err := http.ListenAndServe(addr, router); err != nil {
         log.Fatal(err)
     }
 }
+
