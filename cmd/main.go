@@ -38,7 +38,7 @@ func main() {
     port := os.Getenv("PORT")
 
     // Creating connection string
-    dsn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
+    dsn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable TimeZone=UTC",
         dbHost, dbPort, dbUser, dbName, dbPassword)
 
     // Connecting PostgreSQL

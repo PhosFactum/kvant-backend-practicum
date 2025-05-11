@@ -23,6 +23,7 @@ func NewAuthHandler(db *gorm.DB) *AuthHandler {
 
 // Login godoc
 // @Summary Login and get JWT token
+// @Tags Login
 // @Accept json
 // @Produce json
 // @Param credentials body LoginInput true "Login credentials"

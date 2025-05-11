@@ -19,6 +19,7 @@ func NewUserHandler(db *gorm.DB) *UserHandler {
 
 // GetAllUsers godoc
 // @Summary Get all users
+// @Tags Users
 // @Produce json
 // @Success 200 {array} models.User
 // @Failure 500 {object} map[string]string
@@ -34,6 +35,7 @@ func (h *UserHandler) GetUsers(c *gin.Context) {
 
 // GetUserByID godoc
 // @Summary Get user by ID
+// @Tags Users
 // @Param id path int true "User ID"
 // @Success 200 {object} models.User
 // @Failure 404 {object} map[string]string
@@ -50,6 +52,7 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 
 // CreateUser godoc
 // @Summary Create a new user
+// @Tags Users
 // @Accept json
 // @Produce json
 // @Param user body models.CreateUserInput true "User to create"
@@ -99,6 +102,7 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 
 // UpdateUser godoc
 // @Summary Update user by ID
+// @Tags Users
 // @Param id path int true "User ID"
 // @Param user body models.User true "Updated user data"
 // @Success 200 {object} models.User
@@ -132,6 +136,7 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 
 // DeleteUser godoc
 // @Summary Delete user by ID
+// @Tags Users
 // @Param id path int true "User ID"
 // @Success 204
 // @Failure 404 {object} map[string]string
