@@ -54,7 +54,7 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 // @Success 201 {object} models.User
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /user [post] // Исправлен путь
+// @Router /users [post] // Исправлен путь
 func (h *UserHandler) CreateUser(c *gin.Context) {
     var user models.User
     if err := c.ShouldBindJSON(&user); err != nil {

@@ -59,13 +59,20 @@ func main() {
 
     // Инициализация обработчиков
     userHandler := handlers.NewUserHandler(db)
+	orderHandler := handlers.NewOrderHandler(db)
 
     // Роуты
     router.GET("/users", userHandler.GetUsers)
     router.GET("/user/:id", userHandler.GetUserByID)
-    router.POST("/user", userHandler.CreateUser)
+    router.POST("/users", userHandler.CreateUser)
     router.PUT("/user/:id", userHandler.UpdateUser)
     router.DELETE("/user/:id", userHandler.DeleteUser)
+
+	userGroup := router.Group("/users/:user_id")
+	{
+		userGroup.POST("/orders", orderHandler.CreateOrder)
+		userGroup.GET("/orders", orderHandler.GetOrdersByUser)
+	}
 
     // Запуск сервера
     addr := fmt.Sprintf(":%s", port)
