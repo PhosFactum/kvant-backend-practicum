@@ -30,6 +30,7 @@ func NewOrderHandler(db *gorm.DB) *OrderHandler {
 // @Summary Create order for a user
 // @Description Creating a new order for a user
 // @Tags Orders
+// @Security BearerAuth
 // @Accept json
 // @Produce json
 // @Param user_id path int true "User ID"
@@ -74,6 +75,7 @@ func (h *OrderHandler) CreateOrder(c *gin.Context) {
 // @Summary Get orders for a user
 // @Description Checking all orders of a user
 // @Tags Orders
+// @Security BearerAuth
 // @Param user_id path int true "User ID"
 // @Success 200 {array} models.Order
 // @Failure 404 {object} map[string]string
