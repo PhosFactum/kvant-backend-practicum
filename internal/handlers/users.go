@@ -103,6 +103,7 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 // UpdateUser godoc
 // @Summary Update user by ID
 // @Tags Users
+// @Security BearerAuth
 // @Param id path int true "User ID"
 // @Param user body models.User true "Updated user data"
 // @Success 200 {object} models.User
@@ -137,6 +138,7 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 // DeleteUser godoc
 // @Summary Delete user by ID
 // @Tags Users
+// @Security BearerAuth
 // @Param id path int true "User ID"
 // @Success 204
 // @Failure 404 {object} map[string]string

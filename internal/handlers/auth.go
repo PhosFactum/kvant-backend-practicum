@@ -23,15 +23,16 @@ func NewAuthHandler(db *gorm.DB) *AuthHandler {
 
 // Login godoc
 // @Summary Login and get JWT token
-// @Tags Login
+// @Tags Auth
 // @Accept json
 // @Produce json
-// @Param credentials body LoginInput true "Login credentials"
-// @Success 200 {object} TokenResponse
+// @Param credentials body models.LoginInput true "Login credentials"
+// @Success 200 {object} models.TokenResponse
 // @Failure 401 {object} map[string]string
+// @Failure 500 {object} map[string]string
 // @Router /auth/login [post]
 func (h *AuthHandler) Login(c *gin.Context) {
-	var input LoginInput
+	var input models.LoginInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -59,23 +60,12 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	signed, err := token.SignedString([]byte(secret))
+	signedToken, err := token.SignedString([]byte(secret))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to sign token"})
 		return
 	}
 
-	c.JSON(http.StatusOK, TokenResponse{Token: signed})
-}
-
-// LoginInput represents login request
-type LoginInput struct {
-	Email    string `json:"email" binding:"required"`
-	Password string `json:"password" binding:"required"`
-}
-
-// TokenResponse represents JWT response
-type TokenResponse struct {
-	Token string `json:"token"`
+	c.JSON(http.StatusOK, models.TokenResponse{Token: signedToken})
 }
 
