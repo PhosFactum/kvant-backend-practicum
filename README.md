@@ -89,24 +89,6 @@ REST API для управления пользователями и их зак
 
 ---
 
-## 📂 Структура проекта
-
-kvant-backend/
-├── cmd/
-│ ├── main.go # Точка входа
-│ └── migrate/ # Миграции БД
-├── internal/
-│ ├── handlers/ # HTTP-обработчики
-│ ├── models/ # GORM-модели
-│ ├── repository/ # Логика работы с БД
-│ └── middleware/ # JWT-авторизация
-├── docs/ # Swagger-документация
-├── docker-compose.yml # Конфигурация Docker
-└── Dockerfile # Сборка образа
-
-
----
-
 ## 🔒 Авторизация
 - Для защищённых эндпоинтов требуется JWT-токен в заголовке:  
   `Authorization: Bearer <your_token>`
