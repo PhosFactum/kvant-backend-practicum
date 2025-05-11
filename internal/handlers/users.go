@@ -26,6 +26,7 @@ func NewUserHandler(db *gorm.DB) *UserHandler {
 // GetUsers retrieves users with pagination and optional age filters.
 // @Summary Get all users with pagination and age filtering
 // @Tags Users
+// @Security BearerAuth
 // @Produce json
 // @Param page query int false "Page number" default(1)
 // @Param limit query int false "Page size" default(10)
@@ -112,6 +113,7 @@ func (h *UserHandler) GetUsers(c *gin.Context) {
 // GetUserByID returns a single user by ID.
 // @Summary Get user by ID
 // @Tags Users
+// @Security BearerAuth
 // @Param id path int true "User ID"
 // @Success 200 {object} models.User
 // @Failure 404 {object} map[string]string

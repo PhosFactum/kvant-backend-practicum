@@ -8,7 +8,6 @@ import (
     "os"
 
     "github.com/gin-gonic/gin"
-    "github.com/joho/godotenv"
     "github.com/jinzhu/gorm"
     _ "github.com/lib/pq"
 
@@ -51,11 +50,6 @@ import (
 
 // @x-logo {"url": "https://kvant-team.com/logo.png", "backgroundColor": "#FFFFFF", "altText": "KVANT Logo"}
 func main() {
-    // Load .env; fatal if missing
-    if err := godotenv.Load(); err != nil {
-        log.Fatal("error loading .env file:", err)
-    }
-
     // Initialize DB connection
     db := initDB()
     defer db.Close()
