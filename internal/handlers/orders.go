@@ -95,14 +95,4 @@ func (h *OrderHandler) GetOrdersByUser(c *gin.Context) {
     }
 
     c.JSON(http.StatusOK, orders)
-
-    if err := h.db.
-        Where("user_id = ?", userID).
-        Find(&orders).
-        Error; err != nil {
-    	c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to retrieve orders"})
-        return
-    }
-
-    c.JSON(http.StatusOK, orders)
 }
