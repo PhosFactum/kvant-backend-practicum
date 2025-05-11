@@ -23,7 +23,8 @@ import (
 // @host localhost:8080
 // @BasePath /
 func main() {
-    // Загружаем переменные из .env
+
+    // Loading variables from .env
     err := godotenv.Load()
     if err != nil {
         log.Fatal("Ошибка при загрузке .env файла")
@@ -36,48 +37,56 @@ func main() {
     dbPort := os.Getenv("DB_PORT")
     port := os.Getenv("PORT")
 
-    // Формируем строку подключения
+    // Creating connection string
     dsn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
         dbHost, dbPort, dbUser, dbName, dbPassword)
 
-    // Подключение к PostgreSQL
+    // Connecting PostgreSQL
     db, err := gorm.Open("postgres", dsn)
     if err != nil {
         log.Fatal(err)
     }
     defer db.Close()
 
-    // Автомиграции
+    // Automigrations
     db.AutoMigrate(&models.User{}, &models.Order{})
 
-    // Инициализация Gin
+    // Gin init
     router := gin.Default()
 
     // Swagger
     docs.SwaggerInfo.BasePath = "/"
     router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-    // Инициализация обработчиков
+    // Handlers init
     userHandler := handlers.NewUserHandler(db)
 	orderHandler := handlers.NewOrderHandler(db)
 
-    // Роуты
+    // Routers
+	// Users
     router.GET("/users", userHandler.GetUsers)
     router.GET("/user/:id", userHandler.GetUserByID)
     router.POST("/users", userHandler.CreateUser)
     router.PUT("/user/:id", userHandler.UpdateUser)
-    router.DELETE("/user/:id", userHandler.DeleteUser)
 
+	// Orders
+    router.DELETE("/user/:id", userHandler.DeleteUser)
 	userGroup := router.Group("/users/:user_id")
 	{
 		userGroup.POST("/orders", orderHandler.CreateOrder)
 		userGroup.GET("/orders", orderHandler.GetOrdersByUser)
 	}
 
-    // Запуск сервера
+	// Login
+	authHandler := handlers.NewAuthHandler(db)
+	router.POST("/auth/login", authHandler.Login)
+
+
+    // Server's starting
     addr := fmt.Sprintf(":%s", port)
     if err := http.ListenAndServe(addr, router); err != nil {
         log.Fatal(err)
     }
+
 }
 

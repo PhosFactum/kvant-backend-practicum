@@ -5,6 +5,8 @@ import (
     "github.com/PhosFactum/kvant-backend-practicum/internal/models"
     "github.com/gin-gonic/gin"
     "github.com/jinzhu/gorm"
+	"golang.org/x/crypto/bcrypt"
+
 )
 
 type UserHandler struct {
@@ -21,9 +23,9 @@ func NewUserHandler(db *gorm.DB) *UserHandler {
 // @Success 200 {array} models.User
 // @Failure 500 {object} map[string]string
 // @Router /users [get]
-func (h *UserHandler) GetUsers(c *gin.Context) { // Метод структуры UserHandler
+func (h *UserHandler) GetUsers(c *gin.Context) {
     var users []models.User
-    if err := h.db.Find(&users).Error; err != nil { // Используем h.db
+    if err := h.db.Find(&users).Error; err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to retrieve users"})
         return
     }
@@ -50,36 +52,49 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 // @Summary Create a new user
 // @Accept json
 // @Produce json
-// @Param user body models.User true "User to create"
+// @Param user body models.CreateUserInput true "User to create"
 // @Success 201 {object} models.User
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /users [post] // Исправлен путь
+// @Router /users [post]
 func (h *UserHandler) CreateUser(c *gin.Context) {
-    var user models.User
-    if err := c.ShouldBindJSON(&user); err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-    }
+	var input models.CreateUserInput
 
-    // Проверка уникальности email
-    var existing models.User
-    if h.db.Where("email = ?", user.Email).First(&existing).RowsAffected > 0 {
-        c.JSON(http.StatusBadRequest, gin.H{"error": "email already exists"})
-        return
-    }
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
-    if err := h.db.Create(&user).Error; err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create user"})
-        return
-    }
+	var existing models.User
+	if h.db.Where("email = ?", input.Email).First(&existing).RowsAffected > 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "email already exists"})
+		return
+	}
 
-    c.JSON(http.StatusCreated, gin.H{
-        "id":    user.ID,
-        "name":  user.Name,
-        "email": user.Email,
-        "age":   user.Age,
-    })
+	hash, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not hash password"})
+		return
+	}
+
+	user := models.User{
+		Name:         input.Name,
+		Email:        input.Email,
+		Age:          input.Age,
+		PasswordHash: string(hash),
+	}
+
+	if err := h.db.Create(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create user"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"id":    user.ID,
+		"name":  user.Name,
+		"email": user.Email,
+		"age":   user.Age,
+	})
 }
 
 // UpdateUser godoc
