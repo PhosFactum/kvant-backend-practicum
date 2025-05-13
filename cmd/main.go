@@ -1,4 +1,3 @@
-// cmd/main.go
 package main
 
 import (
@@ -15,6 +14,8 @@ import (
     "github.com/PhosFactum/kvant-backend-practicum/internal/handlers"
     "github.com/PhosFactum/kvant-backend-practicum/internal/middleware"
     "github.com/PhosFactum/kvant-backend-practicum/internal/models"
+    "github.com/PhosFactum/kvant-backend-practicum/internal/repository"
+    "github.com/PhosFactum/kvant-backend-practicum/internal/services"
 
     swaggerFiles "github.com/swaggo/files"
     ginSwagger "github.com/swaggo/gin-swagger"
@@ -57,15 +58,24 @@ func main() {
     // Migrate schema
     db.AutoMigrate(&models.User{}, &models.Order{})
 
+    // Initialize repositories
+    userRepo := repository.NewGormUserRepo(db)
+    orderRepo := repository.NewGormOrderRepo(db)
+
+    // Initialize services
+    authSvc := services.NewAuthService(userRepo)
+    userSvc := services.NewUserService(userRepo)
+    orderSvc := services.NewOrderService(userRepo, orderRepo)
+
+    // Initialize handlers
+    authH := handlers.NewAuthHandler(authSvc)
+    userH := handlers.NewUserHandler(userSvc)
+    orderH := handlers.NewOrderHandler(orderSvc)
+
     // Setup router
     router := gin.Default()
     docs.SwaggerInfo.BasePath = "/"
     router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-
-    // Handlers
-    userH := handlers.NewUserHandler(db)
-    orderH := handlers.NewOrderHandler(db)
-    authH := handlers.NewAuthHandler(db)
 
     // Public endpoints
     router.POST("/auth/login", authH.Login)
