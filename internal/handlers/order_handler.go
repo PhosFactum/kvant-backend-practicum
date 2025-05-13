@@ -1,3 +1,4 @@
+// internal/handlers/order_handler.go
 package handlers
 
 import (
@@ -7,6 +8,7 @@ import (
     "github.com/gin-gonic/gin"
     "github.com/PhosFactum/kvant-backend-practicum/internal/models"
     "github.com/PhosFactum/kvant-backend-practicum/internal/services"
+    "github.com/PhosFactum/kvant-backend-practicum/internal/utils"
 )
 
 // OrderHandler manages order-related endpoints.
@@ -49,11 +51,18 @@ func (h *OrderHandler) CreateOrder(c *gin.Context) {
     switch {
     case services.IsNotFound(err):
         c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+        return
     case services.IsValidation(err):
         c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
     case err != nil:
         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
     default:
+        // Асинхронное уведомление о новом заказе
+        utils.Async(func() {
+            _ = h.svc.NotifyOrderCreated(c.Request.Context(), &order)
+        })
         c.JSON(http.StatusCreated, order)
     }
 }
@@ -78,8 +87,10 @@ func (h *OrderHandler) GetOrdersByUser(c *gin.Context) {
     switch {
     case services.IsNotFound(err):
         c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+        return
     case err != nil:
         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
     default:
         c.JSON(http.StatusOK, orders)
     }

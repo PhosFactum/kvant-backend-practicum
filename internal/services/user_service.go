@@ -3,6 +3,7 @@ package services
 import (
     "context"
     "errors"
+    "fmt"
 
     "golang.org/x/crypto/bcrypt"
 
@@ -16,6 +17,7 @@ type UserService interface {
     GetByID(ctx context.Context, id uint) (*models.User, error)
     Update(ctx context.Context, id uint, input models.User) (*models.User, error)
     Delete(ctx context.Context, id uint) error
+    SendWelcomeEmail(ctx context.Context, user *models.User) error
 }
 
 type userService struct {
@@ -72,5 +74,13 @@ func (s *userService) Update(ctx context.Context, id uint, input models.User) (*
 
 func (s *userService) Delete(ctx context.Context, id uint) error {
     return s.repo.Delete(ctx, id)
+}
+
+// SendWelcomeEmail simulates sending a welcome email to the new user.
+func (s *userService) SendWelcomeEmail(ctx context.Context, user *models.User) error {
+    // Здесь может быть интеграция с email-сервисом.
+    // Пока просто логируем.
+    fmt.Printf("Sending welcome email to %s at %s\n", user.Name, user.Email)
+    return nil
 }
 

@@ -18,6 +18,7 @@ var (
 type OrderService interface {
     Create(ctx context.Context, userID uint, req models.OrderRequest) (models.Order, error)
     ListByUser(ctx context.Context, userID uint) ([]models.Order, error)
+    NotifyOrderCreated(ctx context.Context, order *models.Order) error
 }
 
 // IsNotFound helps handler map not-found errors.
@@ -73,5 +74,12 @@ func (s *orderService) ListByUser(ctx context.Context, userID uint) ([]models.Or
     }
     // 2) Вернуть заказы
     return s.orderRepo.ListByUser(ctx, userID)
+}
+
+// NotifyOrderCreated simulates sending a notification about the new order.
+func (s *orderService) NotifyOrderCreated(ctx context.Context, order *models.Order) error {
+    // Здесь можно интегрироваться с email/SMS/через сторонние сервисы
+    fmt.Printf("Notifying user %d about new order %d\n", order.UserID, order.ID)
+    return nil
 }
 
